@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argocd-poc-dev-app
+  namespace: argocd
+spec:
+  project: argocd-j2vo9-dev-apps
+  source:
+    repoURL: https://github.com/giantswarm/argocd-poc-app.git
+    targetRevision: main
+    path: manifests/
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      allowEmpty: false
+      selfHeal: true

@@ -1,0 +1,42 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: prod
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: argocd-j2vo9-prod-apps
+  namespace: argocd
+spec:
+  description: j2vo9 applications
+  # Allow manifests to deploy from any Git repos
+  sourceRepos:
+    - 'https://github.com/giantswarm/argocd-poc-gitops.git'
+  destinations:
+    - namespace: argocd
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argocd-j2vo9-prod-apps
+  namespace: argocd
+spec:
+  project: argocd-j2vo9-prod-apps
+  source:
+    repoURL: https://github.com/giantswarm/argocd-poc-gitops.git
+    targetRevision: main
+    path: environments/prod
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      allowEmpty: false
+      selfHeal: true
